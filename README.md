@@ -11,3 +11,10 @@ Run the [install.sh](/install/install.sh) script to install all dependencies.
 cd install
 ./install.sh
 ```
+
+## Usage
+
+Each folder in the `src` directory contains a script that generates a specific type of message. For example, to generate a SDSM message, run the following command:
+```bash
+./sdsmSim.py
+```
