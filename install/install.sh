@@ -37,7 +37,7 @@ if ! "$VENV_PYTHON" -c "import importlib; importlib.import_module('j2735_202409'
   rm -rf j2735_202409
   # Verify import after install
   if "$VENV_PYTHON" -c "import importlib; importlib.import_module('j2735_202409')" >/dev/null 2>&1; then
-    echo "Installed and verified 'j2735_202409'."
+    echo "Installed and verified 'j2735_202409'"
   else
     echo "Warning: 'j2735_202409' still not importable after install attempt." >&2
   fi
@@ -46,7 +46,6 @@ else
 fi
 
 # Rewrite script shebangs to point at the venv's Python interpreter
-echo "Rewriting script shebangs to use venv Python…"
 for script in "$REPO_ROOT/src/srm/generate-srm.py" "$REPO_ROOT/src/sdsm/sdsmSim.py"; do
   if [ -f "$script" ]; then
     sed -i "1s|^#!.*|#!$VENV_PYTHON|" "$script"
