@@ -27,4 +27,4 @@ One new SDSM will be generated for each entry in the `pos` array. The `refPos` o
 ## Usage
 
 1. Edit the `sdsmTrajectory.json` file to specify the desired trajectory for the SDSM messages.
-2. Run the `generate_sdsm.py` script to create the SDSM messages based on the specified trajectory.
+2. Run the `sdsmSim.py` script to create the SDSM messages based on the specified trajectory.
