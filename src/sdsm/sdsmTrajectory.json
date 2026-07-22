@@ -1,0 +1,27 @@
+{
+  "refPos": {
+    "lat": 389549921,
+    "long": -771492095,
+    "elevation": 30
+  },
+  "pos": [
+    {
+      "offsetX": 32767,
+      "offsetY": 32767,
+      "speed": 100,
+      "heading": 16320
+    },
+    {
+      "offsetX": 32700,
+      "offsetY": 32700,
+      "speed": 100,
+      "heading": 16320
+    },
+    {
+      "offsetX": 32650,
+      "offsetY": 32650,
+      "speed": 100,
+      "heading": 16320
+    }
+  ]
+}
