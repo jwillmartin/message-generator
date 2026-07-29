@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import ast
+import json
+import j2735_202409
 import socket
 import threading
 
@@ -6,6 +9,32 @@ import threading
 _send_sock = None
 _send_sock_lock = threading.Lock()
 _send_dest = None
+
+def make_message_frame(msg_str: str):
+    """Create a J2735 Message Frame using a pre-created message dictionary. 
+    
+    Args:
+        msg_str (str): A J2735 Message dictionary, passed as a string.
+    Returns:
+        frame (SEQ): Message Frame Sequence of the input message dictionary."""
+    msg = ast.literal_eval(msg_str)
+    frame = j2735_202409.MessageFrame.MessageFrame
+    frame.set_val(msg)
+    return frame
+
+def load_path(path_file: str) -> dict:
+    """Load the reference position and object path from a JSON file.
+
+    Args:
+        path_file: Path to a JSON file containing a "refPos" dict
+            {lat, long, elevation} and a "pos" list of
+            {offsetX, offsetY, speed, heading} entries.
+
+    Returns:
+        The parsed JSON as a dictionary.
+    """
+    with open(path_file) as f:
+        return json.load(f)
 
 def map_msg_type_to_psid(msg_type: str) -> str:
     """Map message type to PSID.
