@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-
 import os
 import sys
-import json
-import threading, ast
-import j2735_202409
+import threading
 from time import sleep
 from datetime import datetime
 
@@ -14,20 +11,6 @@ import helper
 # Global variables
 msgCnt = 0
 msgCnt_lock = threading.Lock()
-
-def load_path(path_file: str) -> dict:
-    """Load the reference position and object path from a JSON file.
-
-    Args:
-        path_file: Path to a JSON file containing a "refPos" dict
-            {lat, long, elevation} and a "pos" list of
-            {offsetX, offsetY, speed, heading} entries.
-
-    Returns:
-        The parsed JSON as a dictionary.
-    """
-    with open(path_file) as f:
-        return json.load(f)
 
 def build_sdsm(ref_pos: dict, pos: dict) -> str:
     """Build SDSM dictionary with mandatory fields. Returns a string.
@@ -121,24 +104,15 @@ def get_current_timestamp():
         'second': f"{now.second:02d}",
     }
 
-def make_message_frame(sdsm):
-    msg = ast.literal_eval(sdsm)
-    frame = j2735_202409.MessageFrame.MessageFrame
-    frame.set_val(msg)
-    return frame
-
 def main():
     path_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdsmTrajectory.json")
-    path = load_path(path_file)
+    path = helper.load_path(path_file)
     for pos in path["pos"]:
         sdsm_str = build_sdsm(ref_pos=path["refPos"], pos=pos)
-        frame = make_message_frame(sdsm_str)
+        frame = helper.make_message_frame(sdsm_str)
         uper = frame.to_uper()
-        amf = helper.build_amf(payload=uper.hex(), msg_type="SDSM")
-        helper.send_message(msg=amf.encode('utf-8'), ip_send="127.0.0.1", port_send=1516)
+        helper.send_message(msg=uper, ip_send="127.0.0.1", port_send=1516)
         sleep(0.1)  # Sleep for 100ms between messages
-
-
 
 if __name__ == "__main__":
     main()

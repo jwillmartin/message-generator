@@ -18,3 +18,11 @@ Each folder in the `src` directory contains a script that generates a specific t
 ```bash
 ./sdsmSim.py
 ```
+
+**Note:** A helper file also exists, containing various helper functions used by the message generation scripts. 
+It includes an optional `build_amf` function, which adds the generated payload to an Active Message File. 
+That amf string can be sent to a device for Immediate Forward, if supported. Example addition to `main()`:
+```python
+amf = helper.build_amf(payload=uper.hex(), msg_type="SRM")
+helper.send_message(msg=amf.encode('utf-8'), ip_send="127.0.0.1", port_send=1516)
+```
