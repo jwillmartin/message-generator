@@ -61,21 +61,23 @@ def build_amf(payload: str, msg_type: str) -> str:
     Returns:
         The complete AMF string.
     """
-    amf = f"""
-        Version=0.7
-        Type={msg_type}
-        PSID={map_msg_type_to_psid(msg_type)}
-        Priority=2
-        TxMode=CONT
-        TxChannel=183
-        TxInterval=0
-        DeliveryStart=
-        DeliveryStop=
-        Signature=False
-        Encryption=False
-        Payload="""
-    amf += payload
-    print(f"AMF: {amf}")
+    fields = {
+        "Version":       "0.7",
+        "Type":          msg_type,
+        "PSID":          map_msg_type_to_psid(msg_type),
+        "Priority":      "2",
+        "TxMode":        "CONT",
+        "TxChannel":     "183",
+        "TxInterval":    "0",
+        "DeliveryStart": "",
+        "DeliveryStop":  "",
+        "Signature":     "False",
+        "Encryption":    "False",
+        "Payload":       payload,
+    }
+    amf = "\n".join(f"{key}={value}" for key, value in fields.items())
+
+    print(f"AMF:\n{amf}")
     return amf
 
 def send_message(msg: bytes, ip_send: str = "127.0.0.1", port_send: int = 1516) -> None:
