@@ -3,7 +3,7 @@ import os
 import sys
 import threading
 from time import sleep
-from datetime import datetime
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import helper
@@ -94,7 +94,7 @@ def build_sdsm(ref_pos: dict, pos: dict) -> str:
 
 def get_current_timestamp():
     """Generate the current timestamp as a dictionary."""
-    now = datetime.now()
+    now = datetime.now(tz=timezone.utc)
     return {
         'year': now.year,
         'month': f"{now.month:02d}",
@@ -105,13 +105,14 @@ def get_current_timestamp():
     }
 
 def main():
-    path_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdsmTrajectory.json")
+    path_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdsmTrajectory_rect.json")
     path = helper.load_path(path_file)
     for pos in path["pos"]:
         sdsm_str = build_sdsm(ref_pos=path["refPos"], pos=pos)
         frame = helper.make_message_frame(sdsm_str)
         uper = frame.to_uper()
-        helper.send_message(msg=uper, ip_send="127.0.0.1", port_send=1516)
+        amf = helper.build_amf(uper.hex(), "SDSM", signature=True)
+        helper.send_message(msg=amf.encode(), ip_send="192.168.55.72", port_send=1516)
         sleep(0.1)  # Sleep for 100ms between messages
 
 if __name__ == "__main__":
