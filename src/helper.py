@@ -51,27 +51,28 @@ def map_msg_type_to_psid(msg_type: str) -> str:
     }
     return mapping.get(msg_type, "0x00000000") # Default to 0 if unknown
 
-def build_amf(payload: str, msg_type: str) -> str:
+def build_amf(payload: str, msg_type: str, signature: bool=False) -> str:
     """Build AMF string with given payload.
     
     Args:
         payload: The message payload as a hex string.
         msg_type: The type of message (e.g. "SRM", "SDSM").
-        psid: The PSID for the message.
+        signature: Whether the message requires a signature.
     Returns:
         The complete AMF string.
     """
+    signature_str = "True" if signature else "False"
     fields = {
         "Version":       "0.7",
         "Type":          msg_type,
         "PSID":          map_msg_type_to_psid(msg_type),
-        "Priority":      "2",
+        "Priority":      "3",
         "TxMode":        "CONT",
         "TxChannel":     "183",
         "TxInterval":    "0",
         "DeliveryStart": "",
         "DeliveryStop":  "",
-        "Signature":     "False",
+        "Signature":     signature_str,
         "Encryption":    "False",
         "Payload":       payload,
     }
