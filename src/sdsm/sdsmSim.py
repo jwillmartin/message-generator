@@ -105,7 +105,7 @@ def get_current_timestamp():
     }
 
 def main():
-    path_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdsmTrajectory_rect.json")
+    path_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdsmTrajectory.json")
     path = helper.load_path(path_file)
     for pos in path["pos"]:
         sdsm_str = build_sdsm(ref_pos=path["refPos"], pos=pos)
