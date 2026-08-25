@@ -26,3 +26,8 @@ That amf string can be sent to a device for Immediate Forward, if supported. Exa
 amf = helper.build_amf(payload=uper.hex(), msg_type="SRM")
 helper.send_message(msg=amf.encode('utf-8'), ip_send="127.0.0.1", port_send=1516)
 ```
+
+## Inspecting the Message Schemas
+
+`src/tools/` contains a script that generates the structure of any J2735 message as a tree.
+See [src/tools/README.md](/src/tools/README.md) for the output formats and options.
