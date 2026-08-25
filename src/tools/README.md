@@ -4,8 +4,7 @@
 tree, showing each field's type, its constraints, and whether it is `MANDATORY` or
 `OPTIONAL`.
 
-The list of messages and their `messageId` values is read from the `MessageFrame`
-information object set, so nothing is hard-coded.
+Message contents are read from the `MessageFrame` object set, so nothing is hard-coded.
 
 ## Usage
 
