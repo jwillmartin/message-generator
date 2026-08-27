@@ -2,7 +2,6 @@
 import os
 import sys
 from time import sleep
-from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import helper
@@ -30,12 +29,12 @@ def build_sdsm(ref_pos: dict, pos: dict) -> str:
             "sourceID": source_id,
             "equipmentType": "rsu",
             "sDSMTimeStamp": {
-                "year": int(get_current_timestamp()['year']),
-                "month": int(get_current_timestamp()['month']),
-                "day": int(get_current_timestamp()['day']),
-                "hour": int(get_current_timestamp()['hour']),
-                "minute": int(get_current_timestamp()['minute']),
-                "second": int(get_current_timestamp()['second'])
+                "year": int(helper.get_current_timestamp()['year']),
+                "month": int(helper.get_current_timestamp()['month']),
+                "day": int(helper.get_current_timestamp()['day']),
+                "hour": int(helper.get_current_timestamp()['hour']),
+                "minute": int(helper.get_current_timestamp()['minute']),
+                "second": int(helper.get_current_timestamp()['second'])
             },
             "refPos": {
                 "lat": ref_pos["lat"],
@@ -83,18 +82,6 @@ def build_sdsm(ref_pos: dict, pos: dict) -> str:
     sdsm["value"][1]["objects"].append(obj)
 
     return str(sdsm)
-
-def get_current_timestamp():
-    """Generate the current timestamp as a dictionary."""
-    now = datetime.now(tz=timezone.utc)
-    return {
-        'year': now.year,
-        'month': f"{now.month:02d}",
-        'day': f"{now.day:02d}",
-        'hour': f"{now.hour:02d}",
-        'minute': f"{now.minute:02d}",
-        'second': f"{now.second:02d}",
-    }
 
 def main():
     path_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdsmTrajectory.json")

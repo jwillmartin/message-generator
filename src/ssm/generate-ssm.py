@@ -2,7 +2,6 @@
 import os
 import sys
 import json
-import j2735_202409
 from time import sleep
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -57,13 +56,11 @@ def build_ssm():
 
 def main() -> None:
     """Main function to build and encode SSM message."""
-    frame = j2735_202409.MessageFrame.MessageFrame
-
     # Send 2 messages with a 1 second delay to ensure different timestamps and message counts
     i = 0
     while i < 2:
         ssm_str = build_ssm()
-        frame.from_jer(ssm_str)
+        frame = helper.make_message_frame_jer(ssm_str)
         uper = frame.to_uper()
         amf = helper.build_amf(payload=uper.hex(), msg_type="SSM")
         helper.send_message(msg=amf.encode('utf-8'), ip_send="127.0.0.1", port_send=1516)

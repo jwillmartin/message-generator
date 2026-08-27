@@ -16,8 +16,32 @@ cd install
 
 Each folder in the `src` directory contains a script that generates a specific type of message. For example, to generate a SDSM message, run the following command:
 ```bash
-./sdsmSim.py
+./generate-sdsm.py
 ```
+
+### Available Messages
+
+| Message  | Folder       | Name |
+|----------|--------------|------|
+| `MAP`    | `src/map/`    | MapData |
+| `SPAT`   | `src/spat/`   | SignalPhaseAndTimingMessage |
+| `BSM`    | `src/bsm/`    | BasicSafetyMessage |
+| `NMEA`   | `src/nmea/`   | NMEAcorrections |
+| `RTCM`   | `src/rtcm/`   | RTCMcorrections |
+| `SRM`    | `src/srm/`    | SignalRequestMessage |
+| `SSM`    | `src/ssm/`    | SignalStatusMessage |
+| `TIM`    | `src/tim/`    | TravelerInformationMessage |
+| `PSM`    | `src/psm/`    | PersonalSafetyMessage |
+| `RSM`    | `src/rsm/`    | RoadSafetyMessage |
+| `RWM`    | `src/rwm/`    | RoadWeatherMessage |
+| `TAM`    | `src/tam/`    | TollAdvertisementMessage |
+| `TUM`    | `src/tum/`    | TollUsageMessage |
+| `TUMAck` | `src/tumack/` | TollUsageAckMessage |
+| `SDSM`   | `src/sdsm/`   | SensorDataSharingMessage |
+
+Each script builds the mandatory fields of its message with placeholder values, so each one is just a starting point.
+`BSM`, `PSM`, and `SDSM` are driven by a trajectory file in their folder; the rest send a fixed message twice, one second apart.
+See the README in a message's folder where one is present.
 
 **Note:** A helper file also exists, containing various helper functions used by the message generation scripts. 
 It includes an optional `build_amf` function, which adds the generated payload to an Active Message File. 

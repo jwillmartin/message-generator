@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 import os, sys
-from datetime import datetime
 from time import sleep
-import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import helper
@@ -21,7 +19,7 @@ def build_bsm(pos: dict) -> str:
                 "coreData": {
                     "msgCnt": cnt,
                     "id": bsm_id,
-                    "secMark": get_sec_mark(),
+                    "secMark": helper.get_sec_mark(),
                     "lat": pos["lat"],
                     "long": pos["long"],
                     "elev": pos["elevation"],
@@ -73,20 +71,6 @@ def build_bsm(pos: dict) -> str:
     }
 
     return str(bsm)
-
-def get_sec_mark():
-    """Generate the current secMark based on the system's time."""
-    now = datetime.now()
-    milliseconds = now.microsecond // 1000 + now.second * 1000
-
-    # Leap second handling
-    leap_second = time.gmtime().tm_sec == 60
-    if leap_second:
-        return 60000 + (milliseconds % 1000)  # Use range 60000–60999 for leap seconds
-    elif milliseconds > 60999:
-        return 65535  # Use 65535 for unavailable value
-    else:
-        return milliseconds
 
 def main():
     path_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bsmTrajectory.json")

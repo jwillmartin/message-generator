@@ -5,6 +5,7 @@ import json
 import j2735_202409
 import socket
 import threading
+import time
 
 # Global variables
 _send_sock = None
@@ -23,6 +24,18 @@ def make_message_frame(msg_str: str):
     msg = ast.literal_eval(msg_str)
     frame = j2735_202409.MessageFrame.MessageFrame
     frame.set_val(msg)
+    return frame
+
+def make_message_frame_jer(msg_str: str):
+    """Create a J2735 Message Frame from a JER (JSON) message string.
+
+    Args:
+        msg_str (str): A J2735 Message encoded as a JER/JSON string.
+    Returns:
+        frame (SEQ): Message Frame Sequence of the input message.
+    """
+    frame = j2735_202409.MessageFrame.MessageFrame
+    frame.from_jer(msg_str)
     return frame
 
 def load_path(path_file: str) -> dict:
@@ -48,10 +61,24 @@ def map_msg_type_to_psid(msg_type: str) -> str:
         The corresponding PSID as a hex string.
     """
     mapping = {
-        "BSM":  "0x20",
-        "SRM":  "0xE0000016",
-        "SDSM": "0x8010"
+        "BSM":    "0x20",
+        "PSM":    "0x27",
+        "NMEA":   "0x8001",
+        "RTCM":   "0x8001",
+        "SPAT":   "0x8002",
+        "TIM":    "0x8003",
+        "RSM":    "0x8003",
+        "TAM":    "0x800F",
+        "TUM":    "0x800F",
+        "TUMAck": "0x800F",
+        "SDSM":   "0x8010",
+        "SSM":    "0xE0000015",
+        "SRM":    "0xE0000016",
+        "MAP":    "0xE0000017",
+        "RWM":    "0xE0000019"
     }
+    # Message types without an entry above fall back to the default. Add the value
+    # from your deployment's PSID registry before sending them to a real device.
     return mapping.get(msg_type, "0x00000000") # Default to 0 if unknown
 
 def build_amf(payload: str, msg_type: str, signature: bool=False) -> str:
@@ -155,3 +182,48 @@ def get_eta() -> int:
     else:
         eta = dsecond + 10000
     return eta
+
+def get_time_mark() -> int:
+    """Get the current time of the hour as a J2735 TimeMark.
+
+    Returns:
+        Tenths of a second elapsed in the current hour (0-36111).
+    """
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    return now.minute * 600 + now.second * 10 + now.microsecond // 100000
+
+def get_sec_mark() -> int:
+    """Generate the current secMark based on the system's time.
+
+    Returns:
+        The millisecond of the current minute, 60000-60999 during a leap
+        second, or 65535 when the value is unavailable.
+    """
+    now = datetime.datetime.now()
+    milliseconds = now.microsecond // 1000 + now.second * 1000
+
+    # Leap second handling
+    leap_second = time.gmtime().tm_sec == 60
+    if leap_second:
+        return 60000 + (milliseconds % 1000)  # Use range 60000-60999 for leap seconds
+    elif milliseconds > 60999:
+        return 65535  # Use 65535 for unavailable value
+    else:
+        return milliseconds
+
+def get_current_timestamp() -> dict:
+    """Generate the current UTC timestamp as a dictionary.
+
+    Returns:
+        A dictionary with "year", "month", "day", "hour", "minute", and
+        "second" keys.
+    """
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    return {
+        'year': now.year,
+        'month': f"{now.month:02d}",
+        'day': f"{now.day:02d}",
+        'hour': f"{now.hour:02d}",
+        'minute': f"{now.minute:02d}",
+        'second': f"{now.second:02d}",
+    }
