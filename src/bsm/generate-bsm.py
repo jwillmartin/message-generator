@@ -2,21 +2,14 @@
 import os, sys
 from datetime import datetime
 from time import sleep
-import time, threading
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import helper
 
-# Global variables
-msgCnt = 0
-msgCnt_lock = threading.Lock()
-
 def build_bsm(pos: dict) -> str:
     """Build BSM dictionary with mandatory fields. Returns a string."""
-    global msgCnt
-    with msgCnt_lock:
-        cnt = msgCnt
-        msgCnt = (msgCnt + 1) & 0x7F # msgCnt is 0-127 (wrap at 128)
+    cnt = helper.next_msg_cnt()
 
     bsm_id = bytes.fromhex("597f0d67")
     

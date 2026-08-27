@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-import datetime
 import os
 import sys
-import threading
 import json
 import j2735_202409
 from time import sleep
@@ -10,24 +8,17 @@ from time import sleep
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import helper
 
-# Global variables
-msgCnt = 0
-msgCnt_lock = threading.Lock()
-
 def build_ssm():
     """Build SSM dictionary with mandatory fields. Returns a string."""
-    global msgCnt
-    with msgCnt_lock:
-        cnt = msgCnt
-        msgCnt = (msgCnt + 1) & 0x7F # msgCnt is 0-127 (wrap at 128)
+    cnt = helper.next_msg_cnt()
 
     entity_id = "40322472"
 
     ssm = {
         'messageId': 30,
         'value': {
-            'timeStamp': get_moy(),
-            'second': get_dsecond(),
+            'timeStamp': helper.get_moy(),
+            'second': helper.get_dsecond(),
             'sequenceNumber': cnt,
             'status': [
                 {
@@ -51,8 +42,8 @@ def build_ssm():
                     'outboundOn': {
                     'lane': 15
                     },
-                    'minute': get_moy(),
-                    'second': get_eta(),
+                    'minute': helper.get_moy(),
+                    'second': helper.get_eta(),
                     'duration': 10000,
                     'status': 'rejected' # requested, processing, watchOtherTraffic, granted, rejected, maxPresense, reserviceLocked
                     }
@@ -63,31 +54,6 @@ def build_ssm():
     }
 
     return json.dumps(ssm)
-
-def get_moy() -> int:
-    """Get estimated future minute of year."""
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
-    start_of_year = datetime.datetime(now.year, 1, 1, tzinfo=datetime.timezone.utc)
-    delta = now - start_of_year
-    moy = delta.days * 1440 + now.hour * 60 + now.minute
-    if get_dsecond() + 10000 >= 60000:
-        moy += 1
-    return moy
-
-def get_dsecond() -> int:
-    """Get millisecond of current minute."""
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
-    dsecond = now.second * 1000 + now.microsecond // 1000
-    return dsecond
-
-def get_eta() -> int:
-    """Return a 10 second estimated time of arrival in milliseconds of the current minute."""
-    dsecond = get_dsecond()
-    if dsecond + 10000 >= 60000:
-        eta = (dsecond + 10000) - 60000
-    else:
-        eta = dsecond + 10000
-    return eta
 
 def main() -> None:
     """Main function to build and encode SSM message."""

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import ast
+import datetime
 import json
 import j2735_202409
 import socket
@@ -9,6 +10,8 @@ import threading
 _send_sock = None
 _send_sock_lock = threading.Lock()
 _send_dest = None
+_msg_cnt = 0
+_msg_cnt_lock = threading.Lock()
 
 def make_message_frame(msg_str: str):
     """Create a J2735 Message Frame using a pre-created message dictionary. 
@@ -102,3 +105,53 @@ def send_message(msg: bytes, ip_send: str = "127.0.0.1", port_send: int = 1516) 
         sock.send(msg)
     except Exception as e:
         print(f"Error in send function: {e}")
+
+def next_msg_cnt() -> int:
+    """Return the next message count, incrementing the shared counter.
+
+    Returns:
+        The current message count, in the range 0-127 (wraps at 128).
+    """
+    global _msg_cnt
+    with _msg_cnt_lock:
+        cnt = _msg_cnt
+        _msg_cnt = (_msg_cnt + 1) & 0x7F # msgCnt is 0-127 (wrap at 128)
+    return cnt
+
+def get_moy() -> int:
+    """Get estimated future minute of year.
+
+    Returns:
+        The minute of the year, advanced by one if the ETA wraps into the
+        next minute.
+    """
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    start_of_year = datetime.datetime(now.year, 1, 1, tzinfo=datetime.timezone.utc)
+    delta = now - start_of_year
+    moy = delta.days * 1440 + now.hour * 60 + now.minute
+    if get_dsecond() + 10000 >= 60000:
+        moy += 1
+    return moy
+
+def get_dsecond() -> int:
+    """Get millisecond of current minute.
+
+    Returns:
+        The number of milliseconds elapsed in the current minute.
+    """
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    dsecond = now.second * 1000 + now.microsecond // 1000
+    return dsecond
+
+def get_eta() -> int:
+    """Return a 10 second estimated time of arrival in milliseconds of the current minute.
+
+    Returns:
+        The estimated time of arrival as a millisecond of the minute.
+    """
+    dsecond = get_dsecond()
+    if dsecond + 10000 >= 60000:
+        eta = (dsecond + 10000) - 60000
+    else:
+        eta = dsecond + 10000
+    return eta

@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 import os
 import sys
-import threading
 from time import sleep
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import helper
-
-# Global variables
-msgCnt = 0
-msgCnt_lock = threading.Lock()
 
 def build_sdsm(ref_pos: dict, pos: dict) -> str:
     """Build SDSM dictionary with mandatory fields. Returns a string.
@@ -22,10 +17,7 @@ def build_sdsm(ref_pos: dict, pos: dict) -> str:
     Returns:
         A string representation of the SDSM dictionary.
             """
-    global msgCnt
-    with msgCnt_lock:
-        cnt = msgCnt
-        msgCnt = (msgCnt + 1) & 0x7F # msgCnt is 0-127 (wrap at 128)
+    cnt = helper.next_msg_cnt()
 
     source_id = bytes.fromhex("010C0C0A")
     
