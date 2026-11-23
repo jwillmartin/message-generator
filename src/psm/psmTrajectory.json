@@ -1,0 +1,25 @@
+{
+  "pos": [
+    {
+      "lat": 389549921,
+      "long": -771492095,
+      "elevation": 30,
+      "speed": 60,
+      "heading": 0
+    },
+    {
+      "lat": 389550021,
+      "long": -771492095,
+      "elevation": 30,
+      "speed": 60,
+      "heading": 0
+    },
+    {
+      "lat": 389550121,
+      "long": -771492095,
+      "elevation": 30,
+      "speed": 60,
+      "heading": 0
+    }
+  ]
+}
